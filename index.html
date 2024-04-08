@@ -25,7 +25,7 @@
 <div class="fixed-scene-container">
     <a-scene embedded>
         <a-assets>
-            <a-asset-item id="plexModel" src="plex-14.glb"></a-asset-item>
+            <a-asset-item id="plexModel" src="plex-15.glb"></a-asset-item>
         </a-assets>
         <a-entity id="plex" 
                   gltf-model="#plexModel"
@@ -40,7 +40,7 @@
         const model = e.detail.model;
         const mixer = new THREE.AnimationMixer(model);
         model.animations.forEach(clip => {
-            if (clip.name === "hanim1" || clip.name === "hanim2") {
+            if (clip.name === "dots.001" || clip.name === "wireframe_001") {
                 mixer.clipAction(clip).play();
             }
         });
