@@ -1,17 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scroll-controlled 3D Model Rotation</title>
+    <title>Scroll-controlled Camera Orbit in Three.js</title>
     <style>
-        body { margin: 0; height: 300%; } /* Increase height for more scrollable content */
-        canvas { width: 100%; height: 100vh; display: block; }
+        body {
+            overflow-x: hidden;
+            overflow-y: scroll;
+            padding: 0;
+            margin: 0;
+        }
+        #viewport {
+            position: fixed;
+            margin: 0;
+            padding: 0;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+        .page-wrapper {
+            height: 200vh; /* Adjust this value to control how much the user needs to scroll */
+            padding: 0px;
+            margin: 12px 48px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: calc(100% - 2*48px);
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
+<canvas id="viewport"></canvas>
+<div id="div1" class="page-wrapper"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
 <script>
     let scene, camera, renderer, model;
+    const radius = 10; // Distance from the object
 
     init();
     loadModel();
@@ -19,30 +45,27 @@
     function init() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer = new THREE.WebGLRenderer({antialias: true, canvas: document.getElementById('viewport')});
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
 
-        camera.position.set(0, 0, 5);
+        camera.position.set(radius, 0, 0);
 
         const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 0).normalize();
         scene.add(directionalLight);
 
         window.addEventListener('resize', onWindowResize, false);
-        document.addEventListener('scroll', onDocumentScroll, false);
+        window.addEventListener('scroll', updateCamera, false);
     }
 
     function loadModel() {
         const loader = new THREE.GLTFLoader();
-        loader.load('https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb', function(gltf) {
+        loader.load('cube-test.glb', function(gltf) {
             model = gltf.scene;
             scene.add(model);
             animate();
-            console.log('Model loaded successfully');
         }, undefined, function(error) {
             console.error('An error happened', error);
         });
@@ -54,13 +77,11 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    function onDocumentScroll() {
-        const totalHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollFraction = window.scrollY / totalHeight;
-        const rotation = scrollFraction * Math.PI * 2; // Full rotation at the bottom
-        if (model) {
-            model.rotation.z = rotation;
-        }
+    function updateCamera(ev) {
+        const angle = window.scrollY / 500.0;
+        camera.position.x = radius * Math.cos(angle);
+        camera.position.z = radius * Math.sin(angle);
+        camera.lookAt(scene.position); // Ensure the camera always points to the center of the scene
     }
 
     function animate() {
