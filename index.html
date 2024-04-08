@@ -1,58 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Three.js Blob Effect</title>
+    <meta charset="UTF-8">
+    <title>Rotate Object on Scroll</title>
     <style>
-        body { margin: 0; }
+        body { margin: 0; height: 200vh; } /* Ensure there's enough content to scroll */
         canvas { display: block; }
     </style>
 </head>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
 <script>
-// Scene setup
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+    let scene, camera, renderer, model;
 
-// Geometry and material
-const geometry = new THREE.SphereGeometry(1, 32, 32);
-const vertexShader = `
-    uniform float time;
-    void main() {
-        vec3 pos = position + normal * sin(time + position.x * 2.0) * 0.1;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    init();
+    function init() {
+        // Scene setup
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(0, 1, 1);
+        scene.add(directionalLight);
+
+        // GLTF Model loading
+        const loader = new THREE.GLTFLoader();
+        loader.load('cube-test.glb', function(gltf) {
+            model = gltf.scene;
+            scene.add(model);
+            model.position.set(0, 0, -5); // Adjust model position as needed
+        });
+
+        camera.position.z = 5;
+
+        window.addEventListener('scroll', onScroll, false);
+        
+        animate();
     }
-`;
-const fragmentShader = `
-    void main() {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+    function onScroll() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const scrollFraction = scrollY / maxScroll;
+        
+        // Rotate model based on scroll fraction
+        if (model) {
+            model.rotation.y = scrollFraction * Math.PI * 2; // Full rotation based on scroll
+        }
     }
-`;
-const shaderMaterial = new THREE.ShaderMaterial({
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-        time: { value: 0.0 }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
     }
-});
-
-// Mesh
-const sphere = new THREE.Mesh(geometry, shaderMaterial);
-scene.add(sphere);
-
-camera.position.z = 5;
-
-// Animation
-const clock = new THREE.Clock();
-function animate() {
-    requestAnimationFrame(animate);
-    shaderMaterial.uniforms.time.value = clock.getElapsedTime();
-    renderer.render(scene, camera);
-}
-animate();
 </script>
 </body>
 </html>
