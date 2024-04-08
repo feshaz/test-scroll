@@ -3,14 +3,13 @@
 <head>
     <title>Scroll-controlled 3D Model Rotation</title>
     <style>
-        body { margin: 0; height: 200%; overflow: auto; }
+        body { margin: 0; height: 300%; } /* Increase height for more scrollable content */
         canvas { width: 100%; height: 100vh; display: block; }
     </style>
-    <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
 <script>
     let scene, camera, renderer, model;
 
@@ -20,23 +19,20 @@
     function init() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        camera.position.z = 5;
+        camera.position.set(0, 0, 5);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight.position.set(0, 1, 1);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 0).normalize();
         scene.add(directionalLight);
 
-        // Handle window resize
         window.addEventListener('resize', onWindowResize, false);
-        
-        // Scroll event to rotate model
         document.addEventListener('scroll', onDocumentScroll, false);
     }
 
@@ -46,6 +42,9 @@
             model = gltf.scene;
             scene.add(model);
             animate();
+            console.log('Model loaded successfully');
+        }, undefined, function(error) {
+            console.error('An error happened', error);
         });
     }
 
@@ -56,10 +55,12 @@
     }
 
     function onDocumentScroll() {
-        const totalScroll = document.body.scrollHeight - window.innerHeight;
-        const currentScroll = window.scrollY;
-        const rotation = (currentScroll / totalScroll) * Math.PI; // Full rotation at the end of scroll
-        if (model) model.rotation.z = rotation;
+        const totalHeight = document.body.scrollHeight - window.innerHeight;
+        const scrollFraction = window.scrollY / totalHeight;
+        const rotation = scrollFraction * Math.PI * 2; // Full rotation at the bottom
+        if (model) {
+            model.rotation.z = rotation;
+        }
     }
 
     function animate() {
@@ -67,6 +68,5 @@
         renderer.render(scene, camera);
     }
 </script>
-
 </body>
 </html>
