@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Fixed-Position A-Frame Scene with GLB Animation</title>
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- Ensure the inclusion of components that might not be part of the core A-Frame build -->
-    <script src="https://unpkg.com/aframe-animation-component/dist/aframe-animation-component.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <style>
         body { 
             margin: 0; 
@@ -27,12 +25,10 @@
 <div class="fixed-scene-container">
     <a-scene embedded>
         <a-assets>
-            <!-- Preload the model to ensure it's loaded before use -->
             <a-asset-item id="plexModel" src="plex-12.glb"></a-asset-item>
         </a-assets>
         <a-entity id="plex" 
                   gltf-model="#plexModel"
-                  animation-mixer
                   position="0 1 -3"
                   scale="0.5 0.5 0.5"></a-entity>
         <a-sky color="#ECECEC"></a-sky>
@@ -40,16 +36,28 @@
 </div>
 
 <script>
-    // Listen for scroll events
+    document.querySelector('#plex').addEventListener('model-loaded', e => {
+        const model = e.detail.model;
+        const mixer = new THREE.AnimationMixer(model);
+        model.animations.forEach(clip => {
+            if (clip.name === "Key|Action" || clip.name === "Key.001|Action") {
+                mixer.clipAction(clip).play();
+            }
+        });
+
+        document.querySelector('a-scene').addEventListener('render-target-loaded', () => {
+            const clock = new THREE.Clock();
+            document.querySelector('a-scene').addEventListener('render', () => {
+                mixer.update(clock.getDelta());
+            });
+        });
+    });
+
     window.addEventListener('scroll', function() {
         const scrollY = window.scrollY || window.pageYOffset;
         const maxScroll = document.body.scrollHeight - window.innerHeight;
         const scrollFraction = scrollY / maxScroll;
-
-        // Calculate rotation
         const rotation = scrollFraction * 360;
-
-        // Apply rotation to the model
         const plex = document.querySelector('#plex');
         plex.setAttribute('rotation', `0 ${rotation} 0`);
     });
