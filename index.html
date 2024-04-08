@@ -2,64 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rotate Object on Scroll</title>
+    <title>Scroll-Driven Model Rotation with A-Frame</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <style>
-        body { margin: 0; height: 200vh; } /* Ensure there's enough content to scroll */
-        canvas { display: block; }
+        body { height: 200vh; } /* Make sure there's enough content to scroll */
     </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
+
+<a-scene embedded style="width: 100%; height: 100vh;">
+    <a-entity id="armstrong" gltf-model="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb"
+              position="0 1 -3"
+              scale="0.5 0.5 0.5"></a-entity>
+    <a-sky color="#ECECEC"></a-sky>
+</a-scene>
+
 <script>
-    let scene, camera, renderer, model;
-
-    init();
-    function init() {
-        // Scene setup
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight.position.set(0, 1, 1);
-        scene.add(directionalLight);
-
-        // GLTF Model loading
-        const loader = new THREE.GLTFLoader();
-        loader.load('cube-test.glb', function(gltf) {
-            model = gltf.scene;
-            scene.add(model);
-            model.position.set(0, 0, -5); // Adjust model position as needed
-        });
-
-        camera.position.z = 5;
-
-        window.addEventListener('scroll', onScroll, false);
-        
-        animate();
-    }
-
-    function onScroll() {
+    // Listen for scroll events
+    window.addEventListener('scroll', function() {
         const scrollY = window.scrollY || window.pageYOffset;
         const maxScroll = document.body.scrollHeight - window.innerHeight;
         const scrollFraction = scrollY / maxScroll;
-        
-        // Rotate model based on scroll fraction
-        if (model) {
-            model.rotation.y = scrollFraction * Math.PI * 2; // Full rotation based on scroll
-        }
-    }
 
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    }
+        // Calculate rotation
+        const rotation = scrollFraction * 360;
+
+        // Apply rotation to the model
+        const armstrong = document.querySelector('#armstrong');
+        armstrong.setAttribute('rotation', `0 ${rotation} 0`);
+    });
 </script>
+
 </body>
 </html>
