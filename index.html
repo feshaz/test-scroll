@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer"></script>
+    <style>
+        model-viewer {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        body, html {
+            height: 200%; /* Ensure there's enough content to scroll */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<model-viewer id="armstrong" src="https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb" alt="A 3D model of Neil Armstrong" auto-rotate camera-controls></model-viewer>
+
+<script>
+    document.addEventListener('scroll', function() {
+        const totalScroll = document.body.scrollHeight - window.innerHeight;
+        const currentScroll = window.scrollY;
+        // Map the scroll position to a 0 - 180 range for rotation
+        const rotationDegree = (currentScroll / totalScroll) * 180;
+        
+        // Update the camera-orbit attribute to rotate the model
+        const modelViewer = document.getElementById('armstrong');
+        modelViewer.setAttribute('camera-orbit', `${rotationDegree}deg 90deg 105%`);
+    });
+</script>
+
+</body>
+</html>
