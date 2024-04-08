@@ -1,93 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Scroll-controlled Camera Orbit in Three.js</title>
+    <title>Three.js Blob Effect</title>
     <style>
-        body {
-            overflow-x: hidden;
-            overflow-y: scroll;
-            padding: 0;
-            margin: 0;
-        }
-        #viewport {
-            position: fixed;
-            margin: 0;
-            padding: 0;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-        }
-        .page-wrapper {
-            height: 200vh; /* Adjust this value to control how much the user needs to scroll */
-            padding: 0px;
-            margin: 12px 48px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: calc(100% - 2*48px);
-            word-wrap: break-word;
-        }
+        body { margin: 0; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-<canvas id="viewport"></canvas>
-<div id="div1" class="page-wrapper"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
 <script>
-    let scene, camera, renderer, model;
-    const radius = 10; // Distance from the object
+// Scene setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-    init();
-    loadModel();
-
-    function init() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({antialias: true, canvas: document.getElementById('viewport')});
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        camera.position.set(radius, 0, 0);
-
-        const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        scene.add(directionalLight);
-
-        window.addEventListener('resize', onWindowResize, false);
-        window.addEventListener('scroll', updateCamera, false);
+// Geometry and material
+const geometry = new THREE.SphereGeometry(1, 32, 32);
+const vertexShader = `
+    uniform float time;
+    void main() {
+        vec3 pos = position + normal * sin(time + position.x * 2.0) * 0.1;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
     }
-
-    function loadModel() {
-        const loader = new THREE.GLTFLoader();
-        loader.load('cube-test.glb', function(gltf) {
-            model = gltf.scene;
-            scene.add(model);
-            animate();
-        }, undefined, function(error) {
-            console.error('An error happened', error);
-        });
+`;
+const fragmentShader = `
+    void main() {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
-
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+`;
+const shaderMaterial = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+        time: { value: 0.0 }
     }
+});
 
-    function updateCamera(ev) {
-        const angle = window.scrollY / 500.0;
-        camera.position.x = radius * Math.cos(angle);
-        camera.position.z = radius * Math.sin(angle);
-        camera.lookAt(scene.position); // Ensure the camera always points to the center of the scene
-    }
+// Mesh
+const sphere = new THREE.Mesh(geometry, shaderMaterial);
+scene.add(sphere);
 
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    }
+camera.position.z = 5;
+
+// Animation
+const clock = new THREE.Clock();
+function animate() {
+    requestAnimationFrame(animate);
+    shaderMaterial.uniforms.time.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+}
+animate();
 </script>
 </body>
 </html>
