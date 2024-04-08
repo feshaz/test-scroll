@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fixed-Position A-Frame Scene with Animation</title>
+    <title>Fixed-Position A-Frame Scene with GLB Animation</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- Ensure the inclusion of components that might not be part of the core A-Frame build -->
+    <script src="https://unpkg.com/aframe-animation-component/dist/aframe-animation-component.min.js"></script>
     <style>
         body { 
             margin: 0; 
@@ -24,17 +26,18 @@
 
 <div class="fixed-scene-container">
     <a-scene embedded>
-        <!-- Add the animation-mixer component to automatically play animations -->
-        <a-entity id="armstrong" 
-                  gltf-model="plex-12.glb"
+        <a-assets>
+            <!-- Preload the model to ensure it's loaded before use -->
+            <a-asset-item id="plexModel" src="plex-12.glb"></a-asset-item>
+        </a-assets>
+        <a-entity id="plex" 
+                  gltf-model="#plexModel"
                   animation-mixer
                   position="0 1 -3"
                   scale="0.5 0.5 0.5"></a-entity>
         <a-sky color="#ECECEC"></a-sky>
     </a-scene>
 </div>
-
-<!-- Your page content here -->
 
 <script>
     // Listen for scroll events
@@ -47,8 +50,8 @@
         const rotation = scrollFraction * 360;
 
         // Apply rotation to the model
-        const armstrong = document.querySelector('#armstrong');
-        armstrong.setAttribute('rotation', `0 ${rotation} 0`);
+        const plex = document.querySelector('#plex');
+        plex.setAttribute('rotation', `0 ${rotation} 0`);
     });
 </script>
 
