@@ -39,6 +39,9 @@
 
 <script>
 window.addEventListener('message', (event) => {
+    console.log('Message received from:', event.origin); // Log the origin of the message
+    console.log('Received data:', event.data); // Log the received data
+
     // It's good practice to verify the origin of the message for security reasons
     if (event.origin === "https://seedbox-bc3e34.webflow.io/") { // Adjust to match the origin of your parent page
         if (event.data.scrollY !== undefined) {
@@ -52,6 +55,8 @@ window.addEventListener('message', (event) => {
             const plex = document.querySelector('#plex');
             plex.setAttribute('rotation', `0 ${rotation} 0`);
         }
+    } else {
+        console.log('Message from untrusted origin:', event.origin);
     }
 });
 </script>
