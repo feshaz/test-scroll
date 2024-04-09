@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Scroll-Controlled Animation with A-Frame</title>
+    <title></title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <style>
         body { 
             margin: 0; 
-            height: 200vh; /* Ensure there's enough content to scroll */
+            height: 200vh;
             overflow: auto;
         }
         .fixed-scene-container {
-            position: fixed; /* Make the scene fixed */
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
-            z-index: -1; /* Ensure content can scroll over the scene */
+            z-index: -1; 
         }
     </style>
 </head>
@@ -39,14 +39,10 @@
 
 <script>
 window.addEventListener('message', (event) => {
-    console.log('Message received from:', event.origin); // Log the origin of the message
-    console.log('Received data:', event.data); // Log the received data
-
-    // It's good practice to verify the origin of the message for security reasons
-    if (event.origin === "https://seedbox-bc3e34.webflow.io") { // Adjust to match the origin of your parent page
+    
+    if (event.origin === "https://seedbox-bc3e34.webflow.io") { 
         if (event.data.scrollY !== undefined) {
-            // Here you handle the scroll event. 
-            // The example below assumes you're rotating an object based on scroll position.
+            
             const scrollY = event.data.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
             const scrollFraction = scrollY / maxScroll;
