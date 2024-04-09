@@ -38,15 +38,22 @@
 </div>
 
 <script>
-    window.addEventListener('scroll', function() {
-        const scrollY = window.scrollY || window.pageYOffset;
-        const maxScroll = document.body.scrollHeight - window.innerHeight;
-        const scrollFraction = scrollY / maxScroll;
-        const rotation = scrollFraction * 360;
-        
-        const plex = document.querySelector('#plex');
-        plex.setAttribute('rotation', `0 ${rotation} 0`);
-    });
+window.addEventListener('message', (event) => {
+    // It's good practice to verify the origin of the message for security reasons
+    if (event.origin === "http://yourparentpage.com") { // Adjust to match the origin of your parent page
+        if (event.data.scrollY !== undefined) {
+            // Here you handle the scroll event. 
+            // The example below assumes you're rotating an object based on scroll position.
+            const scrollY = event.data.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollFraction = scrollY / maxScroll;
+            const rotation = scrollFraction * 360;
+
+            const plex = document.querySelector('#plex');
+            plex.setAttribute('rotation', `0 ${rotation} 0`);
+        }
+    }
+});
 </script>
 
 </body>
