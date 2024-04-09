@@ -44,6 +44,7 @@ window.addEventListener('message', (event) => {
 
     if (event.origin === "https://seedbox-bc3e34.webflow.io") { 
         if (event.data.scrollY !== undefined) {
+            console.log("rotation must run");
             
             const scrollY = event.data.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
