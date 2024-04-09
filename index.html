@@ -40,7 +40,7 @@
 <script>
 window.addEventListener('message', (event) => {
     // It's good practice to verify the origin of the message for security reasons
-    if (event.origin === "https://seedbox-bc3e34.webflow.io/") { // Adjust to match the origin of your parent page
+    if (event.origin === "https://seedbox-bc3e34.webflow.io/test") { // Adjust to match the origin of your parent page
         if (event.data.scrollY !== undefined) {
             // Here you handle the scroll event. 
             // The example below assumes you're rotating an object based on scroll position.
