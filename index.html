@@ -39,9 +39,7 @@
 
 <script>
 window.addEventListener('message', (event) => {
-    console.log('Message received from:', event.origin); // Log the origin of the message
-    console.log('Received data:', event.data); // Log the received data
-
+  
     if (event.origin === "https://seedbox-bc3e34.webflow.io") { 
         if (event.data.scrollY !== undefined) {
             console.log("rotation must run");
